@@ -1,0 +1,77 @@
+﻿@using CandyShop.Web.Helpers
+@model CandyShop.Application.ViewModels.UsuarioViewModel
+
+@{
+    Layout = null;
+    string voltar;
+}
+
+<link rel="stylesheet" type="text/css" href="~/Content/Usuario/detalhesUsuario.css?d=@DateTime.Now.Ticks"/>
+
+<script>
+    $(document).ready(function () {
+        $('.cpf').each(function () {
+            $(this).html(mcpf($(this).html()));
+        });
+    });
+
+    function mcpf(v) {
+        v = v.replace(/\D/g, "");
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+        return v;
+    }
+</script>
+
+<div class="center container">
+    <h4 class="pink-text">Detalhes do usuário :</h4>
+    <hr />
+    <div>
+        @{ string caminho = @Model.Cpf + ".jpg";}
+        <img id="imagemUsuario" src="@Model.Imagem" />
+        <table class="striped centered bordered" style="margin-bottom:50px">
+            <tbody>
+                <tr>
+                    <td class="negrito">Nome: </td>
+                    <td>@Model.NomeUsuario</td>
+                </tr>
+                <tr>
+                    <td class="negrito">CPF: </td>
+                    <td class="cpf">@Model.Cpf</td>
+                </tr>
+                <tr>
+                    <td class="negrito">Saldo do usuário: </td>
+                    <td>@string.Format("{0:C}", Model.SaldoUsuario)</td>
+                </tr>
+                <tr>
+                    <td class="negrito">Status do usuário: </td>
+                    <td>@(Model.Ativo == "A" ? "Ativo" : "Inativo")</td>
+                </tr>
+                <tr>
+                    <td class="negrito">Tipo de usuário: </td>
+                    <td>@(Model.Classificacao == "A" ? "Administrador" : "Usuário")</td>
+                </tr>
+                <tr>
+                    <td class="negrito">E-mail: </td>
+                    <td>@Model.Email</td>
+                </tr>
+            </tbody>
+        </table>
+        @if (ViewBag.telaAnterior.ToString().Equals("Usuários Ativos"))
+        {
+            voltar = "AjaxJsUsuario.listaUsuario()";
+        }
+        else if(ViewBag.telaAnterior.ToString().Equals("Usuários Inativos"))
+        {
+            voltar = "AjaxJsUsuario.listarUsuarioInativo()";
+        }
+        else
+        {
+            voltar = "AjaxJsUsuario.listarUsuarioEmDivida()";
+        }
+        <a class="waves-effect waves-light btn" onclick=@voltar><i class="material-icons left">arrow_back</i>Voltar</a>
+    </div>
+</div>
+

@@ -1,0 +1,28 @@
+﻿h1 {
+	font-weight: bold;
+}
+
+img {
+	max-height: 180px;
+	max-width: 180px;
+}
+
+.container {
+	width: 85%;
+}
+
+input {
+	text-align: center;
+}
+
+.alinhamento {
+	margin-left: 48%;
+}
+
+#imagem{
+	cursor: pointer;
+}
+
+#imagem:hover {
+	opacity: 0.7;
+}

@@ -1,0 +1,13 @@
+﻿img {
+	max-width: 150px;
+	max-height: 150px;
+	display: inline-block;
+}
+
+h4 {
+	font-weight:bold;
+}
+
+.negrito {
+	font-weight: bold;
+}

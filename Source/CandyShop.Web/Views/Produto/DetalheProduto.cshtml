@@ -1,0 +1,54 @@
+﻿@using CandyShop.Web.Helpers
+@model CandyShop.Application.ViewModels.ProdutoViewModel
+
+@{
+    Layout = null;
+}
+
+<link rel="stylesheet" type="text/css" href="~/Content/Produto/detalheProduto.css?d=@DateTime.Now.Ticks" />
+
+<div class="center container">
+    <h4 class="pink-text">Detalhes do Produto</h4>
+    <hr />
+    <div class="col s12">
+        
+        <img src="@Model.ImagemA" />
+        <img src="@Model.ImagemB" />
+        <img src="@Model.ImagemC" />        
+
+        <table class="striped centered bordered" style="margin-bottom:50px">
+            <tbody>
+            <tr>
+                <td class="negrito">Id</td>
+                <td>@Model.IdProduto</td>
+            </tr>
+            <tr>
+                <td class="negrito">Nome</td>
+                <td>@Model.NomeProduto</td>
+            </tr>
+            <tr>
+                <td class="negrito">Preço</td>
+                <td>@string.Format("{0:C}", Model.PrecoProduto)</td>
+            </tr>
+            <tr>
+                <td class="negrito">Categoria</td>
+                <td>@Model.Categoria</td>
+            </tr>
+            <tr>
+                <td class="negrito">Quantidade em estoque</td>
+                <td>@Model.QtdeProduto</td>
+            </tr>
+            <tr>
+                <td class="negrito">Ativo</td>
+                <td>@(Model.Ativo == "A" ? "Sim" : "Não")</td>
+            </tr>
+            </tbody>
+        </table>
+        @{
+            var voltar = ViewBag.telaAnterior.ToString().Equals("Produtos Ativos") ? "AjaxJsProduto.listaProduto()" : "AjaxJsProduto.listarInativos()";
+        }
+        <a class="waves-effect waves-light btn" onclick=@voltar><i class="material-icons left">arrow_back</i>Voltar</a>
+    </div>
+</div>
+
+

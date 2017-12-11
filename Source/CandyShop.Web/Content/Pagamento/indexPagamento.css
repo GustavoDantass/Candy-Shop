@@ -1,0 +1,36 @@
+﻿@media only screen and (max-width : 992px) {
+	.ajustes {
+		margin: 0 auto;
+		width: 75%;
+	}
+	.row .col {
+		float: none;
+	}
+	.row .col .s6 {
+		width: 82%;
+	}
+}
+
+#tabela {
+	width: 100%;
+	max-width: 800px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+	#tabela td {
+		padding: 2px !important;
+	}
+
+#filtro {
+	text-align: center;
+}
+
+#icone {
+	display: inline-block;
+	color: brown;
+}
+
+.btn-large {
+	background-color: #e781a3 !important;
+}

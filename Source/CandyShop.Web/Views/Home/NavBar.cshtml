@@ -1,0 +1,333 @@
+﻿@model CandyShop.Application.ViewModels.CompraViewModel
+
+@{
+    ViewBag.Title = "CandyShop";
+}
+
+<script>
+    $(document).ready(function () {
+        AjaxJsPagamento.init({
+            listarPagamento: '@Url.Action("ListarCpf", "PagamentoUserComum")',
+            inserirPagamento: '@Url.Action("Inserir", "PagamentoUserComum")',
+            concluirPagamento: '@Url.Action("InserirPagamento", "PagamentoUserComum")',
+            padrao: '@Url.Action("NavBar", "Home")'
+        });
+
+        AjaxJsUsuario.init({
+            logOff: '@Url.Action("Deslogar", "UsuarioComum")',
+            trocarSenha: '@Url.Action("TrocarSenha", "UsuarioComum")',
+            CadastraEmail: '@Url.Action("CadastraEmail", "UsuarioComum")'
+        });
+
+        AjaxJsCompra.init({
+            inserirCompra: '@Url.Action("Cadastrar","Home")',
+            historicoCompra: '@Url.Action("ListarCpf", "CompraUserComum")',
+            detalheCompra: '@Url.Action("Detalhes", "CompraUserComum")',
+            navbar: '@Url.Action("NavBar", "Home")'
+        });
+        AjaxJsShop.init({
+            administracao: '@Url.Action("Index", "Admin")',
+            main: '@Url.Action("Index", "Home")',
+            verificaLogin: '@Url.Action("Logar","Home")',
+            verificaEmailExiste: '@Url.Action("VerificaEmailExiste","Home")',
+            padrao: '@Url.Action("NavBar", "Home")',
+            listaCategoria: '@Url.Action("ListarCategoria", "Home")',
+            listarProdutoPorNome: '@Url.Action("ProcurarProduto", "Home")'
+        });
+    });
+</script>
+
+<link href="~/Content/Principal/Main.css?d=@DateTime.Now.Ticks" rel="stylesheet" />
+
+<!--modal de quantidade-->
+<div id="modalQuantidade" class="modal" style="z-index: 99999999">
+    <div class="modal-content center">
+        <font class="pink-text modal-close" title="Fechar" style="font-weight: bold; position: absolute; right: 20px; top: 5px; font-size:24px">X</font>
+        <h3 class="pink-text lighten-1 identQuant">Quantidade</h3>
+        <p class="pink-text center identQuant"></p>
+        <div class="center">
+            <input type="number" id="quantidade" class="center identQuant" autocomplete="off" value="1" />
+            <span class="QtdeInvalida" color="red"></span>
+        </div>
+    </div>
+    <div class="modal-footer identQuant">
+        <a id="adicionaCarrinho" href="#modalCarrinho" class="modal-trigger waves-effect waves-green btn-flat pink-text modal-close" style="font-weight: bold">Confirma</a>
+    </div>
+</div>
+
+<!--modal de Trocar a senha-->
+<div id="trocaSenha" class="modal" style="z-index: 99999999">
+    <div class="modal-content center">
+        <font class="pink-text modal-close" title="Fechar" style="font-weight: bold; position: absolute; right: 20px; top: 5px; font-size:24px">X</font>
+        <h3 class="pink-text lighten-1 identQuant">Troca de Senha</h3>
+        <p class="pink-text center identQuant"></p>
+        <form class="center">
+            <div class="input-field col s12">
+                <input type="password" id="novaSenha" class="center identQuant" maxlength="15" autocomplete="off" />
+                <span id="senhaInvalida" color="red"></span>
+                <label for="novaSenha">Nova Senha: </label>
+            </div>
+            <div class="input-field col s12">
+                <input type="password" id="confirmaNovaSenha" class="center identQuant" maxlength="15" autocomplete="off" />
+                <span id="senhaConfirmadaInvalida" color="red"></span>
+                <label for="confirmaNovaSenha">Confirmar: </label>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer identQuant">
+        <a id="TrocarSenha" disabled class="modal-trigger waves-effect waves-green btn-flat pink-text" style="font-weight: bold">Salvar</a>
+    </div>
+</div>
+
+<!--modal de editar quantidade-->
+<div id="modalEditarQuantidade" class="modal" style="z-index: 99999999">
+    <div class="modal-content center">
+        <font class="pink-text modal-close" title="Fechar" style="font-weight: bold; position: absolute; right: 20px; top: 5px; font-size:24px">X</font>
+        <h3 class="pink-text lighten-1 identQuant">Quantidade</h3>
+        <p id="estoqueEdit" class="pink-text center identQuant"></p>
+        <div class="center">
+            <input type="number" id="quantidadeEdit" class="center identQuant" autocomplete="off" maxlength="3" />
+            <span class="QtdeInvalida" color="red"></span>
+        </div>
+    </div>
+    <div class="modal-footer identQuant">
+        <a id="editarQuantidade" href="#modalCarrinho" disabled class="modal-trigger waves-effect waves-green btn-flat pink-text modal-close" style="font-weight: bold">Confirma</a>
+    </div>
+</div>
+
+<!--modal do carrinho-->
+<div id="modalCarrinho" class="modal">
+    <div class="modal-content center">
+        <font class="pink-text modal-close" title="Fechar" style="font-weight: bold; position: absolute; right: 20px; top: 5px; font-size:24px">X</font>
+        <h3 class="pink-text identQuant" style="font-weight: bold">Carrinho</h3>
+        <div class="collection identQuant">
+            <h1 class="center" style="margin-top:20px">Carrinho vazio</h1>
+        </div>
+    </div>
+    <div class="modal-footer identQuant">
+        <p id="totalCompra" class="pink-text left identQuant">Total da compra R$ 0,00</p>
+        @if (Session["Login"].ToString().Equals("off"))
+        {
+            <a href="#modalLogin" id="confirmarCompra" disabled class="modal-trigger right modal-action modal-close waves-effect waves-light btn-flat pink-text" style="font-weight: bold">Confirmar compra</a>
+        }
+        else
+        {
+            <a id="confirmarCompra" disabled class="modal-trigger right modal-action modal-close waves-effect waves-light btn-flat pink-text" style="font-weight: bold" onclick="AjaxJsCompra.inserirCompra()">Confirmar compra</a>
+        }
+        <a href="#!" id="limpar" class="modal-close right modal-action waves-effect waves-light btn-flat pink-text" style="font-weight: bold">Limpar</a>
+    </div>
+</div>
+
+<!--modal do Login-->
+<div id="modalLogin" class="modal">
+    <div class="modal-content center identQuant">
+        <font class="pink-text modal-close" title="Fechar" style="font-weight: bold; position: absolute; right: 20px; top: 5px; font-size:24px">X</font>
+        <h2 class="pink-text identQuant" style="font-weight: bold">Login</h2>
+        <form>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="cpf" type="text" class="validate identQuant" maxlength="14" autocomplete="off">
+                    <label for="cpf">CPF</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="senha" type="password" class="validate identQuant" maxlength="15" autocomplete="off">
+                    <label for="senha">Senha</label>
+                </div>
+            </div>
+            <a class="dropdown-button modal-trigger" href="#EsqueceuSenha" id="EsqueciSenha">Esqueci minha senha</a>
+        </form>
+    </div>
+    <div class="modal-footer identQuant">
+        <a href="#modalLogin" id="logar" disabled class="modal-trigger right modal-action modal-close waves-effect waves-light btn-flat pink-text" onclick="AjaxJsShop.verificaLogin()" style="font-weight: bold">Logar</a>
+        <a href="#!" id="limpar" class="right modal-close waves-effect waves-light btn-flat pink-text" style="font-weight: bold">Cancelar</a>
+    </div>
+</div>
+
+
+<!--modal do Esqueci minha senha-->
+<div id="EsqueceuSenha" class="modal">
+    <div class="modal-content center identQuant">
+        <font class="pink-text modal-close" title="Fechar" style="font-weight: bold; position: absolute; right: 20px; top: 5px; font-size:24px">X</font>
+        <h2 class="pink-text identQuant" style="font-weight: bold">Esqueci minha Senha</h2>
+        <form>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="Senhacpf" type="text" class="validate identQuant" maxlength="14" autocomplete="off">
+                    <label for="Senhacpf">CPF</label>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer identQuant">
+        <a href="#EsqueceuSenha" id="Enviar" disabled class="modal-trigger right modal-action modal-close waves-effect waves-light btn-flat pink-text" onclick="AjaxJsShop.verificaEmailExiste()" style="font-weight: bold">Enviar</a>
+        <a href="#!" id="Cancelar" class="right modal-close waves-effect waves-light btn-flat pink-text" style="font-weight: bold">Cancelar</a>
+    </div>
+</div>
+
+<!--modal de cadastro de email-->
+<div id="cadastraEmail" class="modal">
+    <div class="modal-content center identQuant">
+        <font class="pink-text modal-close" title="Fechar" style="font-weight: bold; position: absolute; right: 20px; top: 5px; font-size:24px">X</font>
+        <h2 class="pink-text-text identQuant" style="font-weight:bold">Cadastrar e-mail:</h2>
+        <form>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="email" class="validate identQuant" type="email" maxlength="50" placeholder="example@smn.com.br" autocomplete="off" />
+                    <label for="email">Digite seu email:</label>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer identQuant">
+        <a href="#!" id="CadastrarEmail" disabled onclick="AjaxJsUsuario.CadastraEmail()" class="modal-close modal-action right modal-close waves-effect waves-effect waves-light btn-flat pink-text" style="font-weight: bold">Cadastrar</a>
+        <a href="#!" id="Cancelar" class="right modal-close waves-effect waves-light btn-flat pink-text" style="font-weight: bold">Cancelar</a>
+     </div>
+</div>
+
+
+<ul id="dropdownFiltro" class="dropdown-content">
+    <li><a href="#!" onclick="AjaxJsShop.voltarInicio(); ">Todos</a></li>
+    <li><a href="#!" onclick="AjaxJsShop.listaCategoria('Amendoins')">Amendoins</a></li>
+    <li><a href="#!" onclick="AjaxJsShop.listaCategoria('Balas')">Balas</a></li>
+    <li><a href="#!" onclick="AjaxJsShop.listaCategoria('Bebidas')">Bebidas</a></li>
+    <li><a href="#!" onclick="AjaxJsShop.listaCategoria('Chocolates')">Chocolates</a></li>
+    <li><a href="#!" onclick="AjaxJsShop.listaCategoria('Doces')">Doces</a></li>
+    <li><a href="#!" onclick="AjaxJsShop.listaCategoria('Salgadinhos')">Salgadinhos</a></li>
+</ul>
+
+@if (!Session["Login"].ToString().Equals("off"))
+{
+    if (Session["FirstLogin"].ToString().Equals("T"))
+    {
+        <script>
+            $(document).ready(function () {
+                $('#trocaSenha').modal('open');
+                Materialize.toast("Não deixe seu CPF como senha, troque para ter mais segurança. ;)", 5000);
+            });
+        </script>
+    }
+    <!--barra de navegação do DESKTOP-->
+    <nav class="brown darken-3 nav-extended">
+        <div class="nav-wrapper">
+            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+            <a href="#!" class="brand-logo right" title="Inicio" onclick="AjaxJsShop.voltarInicio();" style="font-weight: bold"><i class="material-icons">store</i><font class="pink-text">Candy</font> Shop</a>
+            <!--barra de navegação-->
+            <ul id="dropdownMenu" class="dropdown-content">
+                <li><a href="#!" onclick="AjaxJsPagamento.inserirPagamento()"><i class="material-icons">add</i>Pagamentos</a></li>
+                <li><a href="#!" onclick="AjaxJsPagamento.listarPagamento()"><i class="material-icons">attach_money</i>Listar Pagamentos</a></li>
+                <li><a href="#!" onclick="AjaxJsCompra.historicoCompra()"><i class="material-icons">find_in_page</i>Histórico de Compra</a></li>
+                @if (string.IsNullOrEmpty(Session["Email"].ToString()))
+                {
+                    <li><a href="#cadastraEmail" class="modal-trigger"><i class="material-icons">mail</i>Cadastrar e-mail</a></li>
+                }
+                <li><a href="#trocaSenha" class="modal-trigger"><i class="material-icons">lock_outline</i>Trocar senha</a></li>
+
+                <li class="divider"></li>
+                @if (Session["classificacao"].ToString().Equals("A"))
+                {
+                    <li><a href="@Url.Action("Index", "Admin")"><i class="material-icons">book</i>Administração</a></li>
+                    <li class="divider"></li>
+                }
+                <li><a href="#!" onclick="AjaxJsUsuario.logOff()"><i class="material-icons">power_settings_new</i>Sair</a></li>
+            </ul>
+
+            <ul class="hide-on-med-and-down">
+                <li><a class="dropdown-button" href="#!" data-activates="dropdownMenu">Opções<i class="material-icons right">arrow_drop_down</i></a></li>
+                <li><a class="dropdown-button" title="Saldo atual: @Session["saldoUsuario"]" href="#!"><i class="material-icons left">account_circle</i>@Session["nomeUsuario"] @Session["saldoUsuario"] </a></li>
+                <li><a class="dropdown-button modal-trigger" href="#modalCarrinho"><i class="material-icons left">shopping_cart</i>Seu Carrinho</a></li>
+                <li>
+                    <a class="dropdown-button" title="Pesquisar por categoria" href="#!" data-activates="dropdownFiltro">Filtro<i class="material-icons right">arrow_drop_down</i></a>
+                </li>
+                <li>
+                    <div class="hide-on-med-and-down">
+                        <div>
+                            <div class="input-field">
+                                <input id="search" type="search" title="Procurar um produto" autocomplete="off">
+                                <label class="label-icon" for="search"><i class="material-icons" title="Filtrar">search</i></label>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <!--barra de navegação MOBILE-->
+            <ul class="side-nav" id="mobile-demo">
+                <li><a class="dropdown-button" href="#!"><i class="material-icons left">account_circle</i>@Session["nomeUsuario"] R$ @Session["saldoUsuario"]</a></li>
+                <li><a class="dropdown-button modal-trigger closeMenu" href="#modalCarrinho"><i class="material-icons left">shopping_cart</i>Carrinho</a></li>
+                <li><a href="#!" class="closeMenu" onclick="AjaxJsPagamento.inserirPagamento()"><i class="material-icons">add</i>Inserir Pagamentos</a></li>
+                <li><a href="#!" class="closeMenu" onclick="AjaxJsPagamento.listarPagamento()"><i class="material-icons">attach_money</i>Listar Pagamentos</a></li>
+                <li><a href="#!" class="closeMenu" onclick="AjaxJsCompra.historicoCompra()"><i class="material-icons">find_in_page</i>Historico de Compra</a></li>
+                @if (Session["Email"].ToString() == "NULL")
+                {
+                    <li><a href="#cadastraEmail" class="modal-trigger"><i class="material-icons">mail</i>Cadastrar e-mail</a></li>
+                }
+                <li><a href="#trocaSenha" class="modal-trigger closeMenu"><i class="material-icons">lock_outline</i>Trocar senha</a></li>
+                <li class="divider"></li>
+                @if (Session["classificacao"].ToString().Equals("A"))
+                {
+                    <li><a href="@Url.Action("Index", "Admin")"><i class="material-icons">book</i>Administração</a></li>
+                    <li class="divider"></li>
+                }
+                <li><a href="#!" class="closeMenu" onclick="AjaxJsUsuario.logOff()"><i class="material-icons">power_settings_new</i>Sair</a></li>
+            </ul>
+        </div>
+        <div class="nav-content white">
+            <div class="pesquisaMobile">
+                <div class="input-field">
+                    <input id="search" class="black-text" type="search" placeholder="Filtre sua busca aqui" required autocomplete="off">
+                </div>
+            </div>
+        </div>
+    </nav>
+}
+else
+{
+    <nav class="brown darken-2 nav-extended">
+        <div class="nav-wrapper">
+            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+
+            <a href="#!" class="brand-logo right" title="Inicio" onclick="AjaxJsShop.voltarInicio(); " style="font-weight: bold"><i class="material-icons">store</i><font class="pink-text">Candy</font> Shop</a>
+
+            <ul class="hide-on-med-and-down">
+                <li><a class="dropdown-button modal-trigger" href="#modalLogin"><i class="material-icons left">account_circle</i>Login</a></li>
+                <li><a class="dropdown-button modal-trigger right closeMenu" href="#modalCarrinho"><i class="material-icons left">shopping_cart</i>Carrinho atual</a></li>
+                <li>
+                    <a class="dropdown-button" title="Pesquisar por categoria" href="#!" data-activates="dropdownFiltro">Filtro<i class="material-icons right">arrow_drop_down</i></a>
+                </li>
+                <li>
+                    <div class="col s6 hide-on-med-and-down">
+                        <div>
+                            <div class="input-field">
+                                <input id="search" type="search" title="Procurar um produto" required autocomplete="off">
+                                <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <ul class="side-nav" id="mobile-demo">
+                <li><a class="dropdown-button modal-trigger closeMenu" href="#modalLogin"><i class="material-icons left">account_circle</i>Login</a></li>
+                <li><a class="dropdown-button modal-trigger closeMenu" href="#modalCarrinho"><i class="material-icons left">shopping_cart</i>Carrinho</a></li>
+            </ul>
+        </div>
+        <div class="nav-content white">
+            <div class="pesquisaMobile">
+                <div class="input-field">
+                    <input id="search" class="black-text" type="search" placeholder="Filtre sua busca aqui" required autocomplete="off">
+                </div>
+            </div>
+        </div>
+    </nav>
+}
+
+<div id="DivGrid"></div>
+<script>
+
+    $("#Senhacpf").keyup(function (e) {
+        if (e.keyCode === 13) {
+            alert("batata");
+            $("#Enviar").trigger("click");
+        }
+    });
+</script>

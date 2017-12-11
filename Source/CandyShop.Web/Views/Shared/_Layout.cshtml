@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="~/Content/materialize.min.css" rel="stylesheet" />
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>@ViewBag.Title</title>
+    <link rel="shortcut icon" href="https://i.pinimg.com/originals/37/7c/fd/377cfd227874dd72b6c478d218ec75af.png">
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/materialize")
+    @Styles.Render("~/Content/css")
+
+    <script type="text/javascript" src="~/Js/telaPrincipal/scriptsAdmin.js?d=@DateTime.Now.Ticks"></script>
+    <script type="text/javascript" src="~/Js/telaPrincipal/scriptsPadrao.js?d=@DateTime.Now.Ticks"></script>
+
+    <script type="text/javascript" src="~/Js/Ajax/AjaxCompra.js?d=@DateTime.Now.Ticks"></script>
+    <script type="text/javascript" src="~/Js/Ajax/AjaxPagamento.js?d=@DateTime.Now.Ticks"></script>
+    <script type="text/javascript" src="~/Js/Ajax/AjaxShop.js?d=@DateTime.Now.Ticks"></script>
+    <script type="text/javascript" src="~/Js/Ajax/AjaxProduto.js?d=@DateTime.Now.Ticks"></script>
+    <script type="text/javascript" src="~/Js/Ajax/AjaxUsuario.js?d=@DateTime.Now.Ticks"></script>
+    <script type="text/javascript" src="~/Js/Ajax/funcoesAjax.js?d=@DateTime.Now.Ticks"></script>
+    <script type="text/javascript" src="~/Js/plugins/jquery.devBox.message.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="~/Content/Principal/shop.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="~/Js/plugins/devBox.message.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+    <div id="DivLoad" class="lds-css ng-scope">
+        <div style="width: 100%;height: 100%;position: fixed;height: auto !important;top: 50%;margin-top: -105px;left: 50%;margin-left: -105px;" class="lds-eclipse">
+            <div></div>
+        </div>
+    </div>
+    @RenderBody()
+</body>
+</html>
+
+
